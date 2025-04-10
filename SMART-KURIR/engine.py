@@ -6,9 +6,9 @@ class GameEngine:
         self.win = win
         self.running = True
         self.map_surface = None
-        self.red = pygame.transform.scale(pygame.image.load("assets/red_flag.png"), (50, 50))
-        self.yellow = pygame.transform.scale(pygame.image.load("assets/yellow.png"), (50, 44))
-        self.kurir = pygame.transform.scale(pygame.image.load("assets/kurir.png"), (40, 40))
+        self.red_img = pygame.transform.scale(pygame.image.load("assets/red_flag.png"), (50, 50))
+        self.yellow_img = pygame.transform.scale(pygame.image.load("assets/yellow.png"), (50, 44))
+        self.kurir_img = pygame.transform.scale(pygame.image.load("assets/kurir.png"), (40, 40))
         self.red_pos = self.yellow_pos = self.kurir_pos = None
         self.angle = 0
         self.path = []
@@ -73,21 +73,28 @@ class GameEngine:
 
     def draw_flags(self):
         if self.yellow_pos:
-            pygame.draw.circle(self.win, (255, 255, 0), self.yellow_pos, 8)
-            self.win.blit(self.yellow, self.yellow_pos)
+            pygame.draw.circle(self.win, (255, 255, 0), self.yellow_pos, 6)
+            self.win.blit(self.yellow_img, self.yellow_pos)
         if self.red_pos:
-            pygame.draw.circle(self.win, (255, 0, 0), self.red_pos, 8)
-            self.win.blit(self.red, self.red_pos)
+            pygame.draw.circle(self.win, (255, 0, 0), self.red_pos, 6)
+            self.win.blit(self.red_img, self.red_pos)
 
     def draw_courier(self):
         if self.kurir_pos:
-            rotated = pygame.transform.rotate(self.kurir, self.angle)
+            rotated = pygame.transform.rotate(self.kurir_img, self.angle)
             rect = rotated.get_rect(center=self.kurir_pos)
             self.win.blit(rotated, rect.topleft)
 
     def draw_path(self):
-        for p in self.path:
-            pygame.draw.circle(self.win, (0, 0, 255), p, 2)
+        if len(self.path) > 1:
+            pygame.draw.lines(self.win, (0, 100, 255), False, self.path, 2)
+
+    def render_all(self):
+        self.draw_path()
+        self.draw_flags()
+        self.draw_courier()
+        if self.is_moving:
+            self.move_smooth()
 
     def stop(self):
         self.is_moving = False
