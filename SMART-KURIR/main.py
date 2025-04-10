@@ -4,7 +4,7 @@ from menu import start_menu
 
 pygame.init()
 win = pygame.display.set_mode((1200, 800))
-pygame.display.set_caption("Smart Courier v15")
+pygame.display.set_caption("Smart Courier v16")
 
 engine = GameEngine(win)
 start_menu(engine)
