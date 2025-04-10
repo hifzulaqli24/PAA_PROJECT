@@ -23,7 +23,7 @@ def start_menu(engine):
             engine.is_moving = True
             print("[INFO] Kurir mulai bergerak.")
         else:
-            print("[INFO] Klik Acak dulu!")
+            print("[INFO] Klik Acak terlebih dahulu.")
 
     def stop_callback():
         engine.stop()
@@ -34,17 +34,17 @@ def start_menu(engine):
     def keluar_callback():
         engine.keluar()
 
-    def run_gui():
+    def run():
         menu = tk.Tk()
-        menu.title("Menu Smart Courier v8")
+        menu.title("Menu Smart Courier v9")
 
         tk.Button(menu, text="Load Map", command=load_map_callback).pack(pady=5)
         tk.Button(menu, text="Acak", command=acak_callback).pack(pady=5)
         tk.Button(menu, text="Mulai", command=mulai_callback).pack(pady=5)
         tk.Button(menu, text="Stop", command=stop_callback).pack(pady=5)
-        tk.Button(menu, text="Reset Posisi", command=reset_callback).pack(pady=5)
+        tk.Button(menu, text="Reset", command=reset_callback).pack(pady=5)
         tk.Button(menu, text="Keluar", command=keluar_callback).pack(pady=5)
 
         menu.mainloop()
 
-    threading.Thread(target=run_gui, daemon=True).start()
+    threading.Thread(target=run, daemon=True).start()
