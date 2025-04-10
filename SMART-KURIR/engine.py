@@ -53,6 +53,12 @@ class GameEngine:
         self.path_index = 0
         print(f"[PATH] Panjang path: {len(self.path)}")
 
+    def reset_positions(self):
+        if self.map_surface:
+            self.randomize_positions()
+            self.is_moving = False
+            print("[INFO] Posisi di-reset.")
+
     def generate_path_bfs(self, start, end):
         visited = set()
         queue = deque([(start, [start])])
