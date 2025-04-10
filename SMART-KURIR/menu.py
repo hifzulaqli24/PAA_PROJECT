@@ -28,20 +28,23 @@ def start_menu(engine):
     def stop_callback():
         engine.stop()
 
+    def reset_callback():
+        engine.reset_positions()
+
     def keluar_callback():
         engine.keluar()
 
     def run_gui():
         menu = tk.Tk()
-        menu.title("Menu Smart Courier v6")
+        menu.title("Menu Smart Courier v7")
 
         tk.Button(menu, text="Load Map", command=load_map_callback).pack(pady=5)
         tk.Button(menu, text="Acak", command=acak_callback).pack(pady=5)
         tk.Button(menu, text="Mulai", command=mulai_callback).pack(pady=5)
         tk.Button(menu, text="Stop", command=stop_callback).pack(pady=5)
+        tk.Button(menu, text="Reset Posisi", command=reset_callback).pack(pady=5)
         tk.Button(menu, text="Keluar", command=keluar_callback).pack(pady=5)
 
         menu.mainloop()
 
     threading.Thread(target=run_gui, daemon=True).start()
-s
