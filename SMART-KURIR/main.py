@@ -4,10 +4,10 @@ from engine import GameEngine
 pygame.init()
 WIDTH, HEIGHT = 1200, 800
 win = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Smart Courier - v1")
+pygame.display.set_caption("Smart Courier - v3 (Kurir Bergerak)")
 
 engine = GameEngine(win, WIDTH, HEIGHT)
-engine.load_static_map("maps/map1.jpeg")
+engine.load_map_and_random("maps/map1.jpeg")
 
 clock = pygame.time.Clock()
 running = True
@@ -24,9 +24,11 @@ while running:
         win.blit(engine.yellow_flag_img, engine.yellow_flag_pos)
         win.blit(engine.red_flag_img, engine.red_flag_pos)
 
-        rotated_img = pygame.transform.rotate(engine.courier_img, engine.courier_angle)
-        rect = rotated_img.get_rect(center=engine.courier_pos)
-        win.blit(rotated_img, rect.topleft)
+        if engine.courier_pos:
+            rotated_img = pygame.transform.rotate(engine.courier_img, engine.courier_angle)
+            rect = rotated_img.get_rect(center=engine.courier_pos)
+            win.blit(rotated_img, rect.topleft)
+            engine.update_courier_position()
 
     pygame.display.update()
     clock.tick(60)
