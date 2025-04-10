@@ -20,9 +20,10 @@ def start_menu(engine):
     def mulai_callback():
         if engine.path and len(engine.path) > 1:
             engine.is_moving = True
-            status_label.config(text="Kurir mulai berjalan.")
+            engine.finished = False
+            status_label.config(text="Kurir mulai bergerak.")
         else:
-            status_label.config(text="Klik Acak terlebih dahulu.")
+            status_label.config(text="Path belum ada. Klik Acak.")
 
     def stop_callback():
         engine.stop()
@@ -31,15 +32,24 @@ def start_menu(engine):
     def keluar_callback():
         engine.keluar()
 
-    def run():
-        menu = tk.Tk()
-        menu.title("Smart Courier - Menu v12")
+    def log_callback():
+        log_window = tk.Toplevel(menu)
+        log_window.title("Log Perjalanan")
+        log_text = tk.Text(log_window, width=50, height=15)
+        log_text.pack()
+        log_text.insert(tk.END, "\n".join(engine.log))
 
-        tk.Button(menu, text="Load Map", command=load_map_callback).pack(pady=5)
-        tk.Button(menu, text="Acak", command=acak_callback).pack(pady=5)
-        tk.Button(menu, text="Mulai", command=mulai_callback).pack(pady=5)
-        tk.Button(menu, text="Stop", command=stop_callback).pack(pady=5)
-        tk.Button(menu, text="Keluar", command=keluar_callback).pack(pady=5)
+    def run():
+        global menu
+        menu = tk.Tk()
+        menu.title("Smart Courier - Menu v13")
+
+        tk.Button(menu, text="Load Map", command=load_map_callback).pack(pady=4)
+        tk.Button(menu, text="Acak", command=acak_callback).pack(pady=4)
+        tk.Button(menu, text="Mulai", command=mulai_callback).pack(pady=4)
+        tk.Button(menu, text="Stop", command=stop_callback).pack(pady=4)
+        tk.Button(menu, text="Lihat Log", command=log_callback).pack(pady=4)
+        tk.Button(menu, text="Keluar", command=keluar_callback).pack(pady=4)
 
         global status_label
         status_label = tk.Label(menu, text="Status: Menunggu perintah...")
