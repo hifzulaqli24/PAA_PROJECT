@@ -3,28 +3,44 @@ from tkinter import filedialog
 import threading
 
 def start_menu(engine):
-    def load_map():
+    def load_map_callback():
         root = tk.Tk()
         root.withdraw()
-        file_path = filedialog.askopenfilename(
+        file = filedialog.askopenfilename(
             initialdir="maps",
-            title="Pilih Peta",
+            title="Pilih Map",
             filetypes=[("Image Files", "*.jpeg *.jpg *.png")]
         )
         root.destroy()
-        if file_path:
-            engine.load_map_and_random(file_path)
+        if file:
+            engine.load_map_and_random(file)
 
-    def acak_posisi():
+    def acak_callback():
         engine.randomize_positions()
 
-    def buka_menu():
-        menu = tk.Tk()
-        menu.title("Menu Smart Courier")
+    def mulai_callback():
+        if engine.path and len(engine.path) > 1:
+            engine.is_moving = True
+            print("Kurir mulai bergerak...")
+        else:
+            print("Klik Acak dulu.")
 
-        tk.Button(menu, text="Load Map", command=load_map).pack(pady=5)
-        tk.Button(menu, text="Acak", command=acak_posisi).pack(pady=5)
+    def stop_callback():
+        engine.stop()
+
+    def keluar_callback():
+        engine.keluar()
+
+    def run_gui():
+        menu = tk.Tk()
+        menu.title("Menu Smart Courier v5")
+
+        tk.Button(menu, text="Load Map", command=load_map_callback).pack(pady=5)
+        tk.Button(menu, text="Acak", command=acak_callback).pack(pady=5)
+        tk.Button(menu, text="Mulai", command=mulai_callback).pack(pady=5)
+        tk.Button(menu, text="Stop", command=stop_callback).pack(pady=5)
+        tk.Button(menu, text="Keluar", command=keluar_callback).pack(pady=5)
 
         menu.mainloop()
 
-    threading.Thread(target=buka_menu, daemon=True).start()
+    threading.Thread(target=run_gui, daemon=True).start()
