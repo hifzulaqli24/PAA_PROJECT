@@ -21,9 +21,9 @@ def start_menu(engine):
     def mulai_callback():
         if engine.path and len(engine.path) > 1:
             engine.is_moving = True
-            print("[INFO] Kurir mulai bergerak...")
+            print("[INFO] Kurir mulai bergerak.")
         else:
-            print("[INFO] Klik Acak dulu untuk memulai.")
+            print("[INFO] Klik Acak dulu!")
 
     def stop_callback():
         engine.stop()
@@ -36,7 +36,7 @@ def start_menu(engine):
 
     def run_gui():
         menu = tk.Tk()
-        menu.title("Menu Smart Courier v7")
+        menu.title("Menu Smart Courier v8")
 
         tk.Button(menu, text="Load Map", command=load_map_callback).pack(pady=5)
         tk.Button(menu, text="Acak", command=acak_callback).pack(pady=5)
