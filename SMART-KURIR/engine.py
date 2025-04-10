@@ -11,7 +11,7 @@ class GameEngine:
         self.height = height
         self.running = True
 
-        # Load assets
+        # === ORANG 2: VISUALISASI ===
         self.map_surface = None
         self.red_flag_img = pygame.transform.scale(pygame.image.load("assets/red_flag.png"), (50, 50))
         self.yellow_flag_img = pygame.transform.scale(pygame.image.load("assets/yellow.png"), (50, 44))
@@ -22,7 +22,7 @@ class GameEngine:
         self.courier_pos = None
         self.courier_angle = 0
 
-        # Path and movement
+        # === ORANG 1: LOGIKA & BFS ===
         self.path = []
         self.path_index = 0
         self.is_moving = False
@@ -33,6 +33,7 @@ class GameEngine:
         self.map_surface = pygame.transform.scale(self.map_surface, (self.width, self.height))
         self.randomize_positions()
 
+    # ORANG 1
     def is_jalan(self, color):
         r, g, b = color
         return 90 <= r <= 100 and 90 <= g <= 100 and 90 <= b <= 100
@@ -54,6 +55,7 @@ class GameEngine:
         self.path_index = 0
         self.is_moving = False
 
+    # ORANG 1
     def generate_path_bfs(self, start, end):
         visited = set()
         queue = deque([(start, [start])])
@@ -73,6 +75,7 @@ class GameEngine:
                         queue.append(((nx, ny), path + [(nx, ny)]))
         return []
 
+    # ORANG 2
     def move_smooth(self):
         if self.path_index < len(self.path):
             target = self.path[self.path_index]
@@ -96,6 +99,7 @@ class GameEngine:
             angle = math.degrees(math.atan2(-dy, dx))
             self.courier_angle = angle
 
+    # ORANG 2
     def draw_flags(self):
         if self.yellow_flag_pos:
             self.win.blit(self.yellow_flag_img, self.yellow_flag_pos)
@@ -121,6 +125,7 @@ class GameEngine:
         else:
             return "Status: Siap."
 
+    # ORANG 3
     def stop(self):
         self.is_moving = False
 
