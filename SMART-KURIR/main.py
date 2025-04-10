@@ -5,7 +5,7 @@ from menu import start_menu
 pygame.init()
 WIDTH, HEIGHT = 1200, 800
 win = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Smart Courier v7")
+pygame.display.set_caption("Smart Courier v8")
 
 engine = GameEngine(win, WIDTH, HEIGHT)
 start_menu(engine)
@@ -22,6 +22,12 @@ while engine.running:
 
     if engine.map_surface:
         win.blit(engine.map_surface, (0, 0))
+
+        # Highlight path
+        if engine.path:
+            for point in engine.path:
+                pygame.draw.circle(win, (0, 0, 255), point, 2)
+
         if engine.yellow_flag_pos:
             win.blit(engine.yellow_flag_img, engine.yellow_flag_pos)
         if engine.red_flag_pos:
@@ -35,6 +41,8 @@ while engine.running:
 
         # Status tampilan
         status = "Mengantar..." if engine.is_moving else "Siap"
+        if engine.path_index >= len(engine.path) and not engine.is_moving:
+            status = "Kurir telah sampai!"
         text_surface = font.render(f"Status: {status}", True, (0, 0, 0))
         win.blit(text_surface, (10, 10))
 
