@@ -11,16 +11,19 @@ class GameEngine:
         self.height = height
         self.running = True
 
+        # Muat aset gambar
         self.map_surface = None
         self.red_flag_img = pygame.transform.scale(pygame.image.load("assets/red_flag.png"), (50, 50))
         self.yellow_flag_img = pygame.transform.scale(pygame.image.load("assets/yellow.png"), (50, 44))
         self.courier_img = pygame.transform.scale(pygame.image.load("assets/kurir.png"), (40, 40))
 
+        # Posisi dan arah
         self.red_flag_pos = None
         self.yellow_flag_pos = None
         self.courier_pos = None
         self.courier_angle = 0
 
+        # Pathfinding
         self.path = []
         self.path_index = 0
         self.is_moving = False
@@ -30,7 +33,6 @@ class GameEngine:
         self.map_surface = pygame.image.load(path)
         self.map_surface = pygame.transform.scale(self.map_surface, (self.width, self.height))
         self.randomize_positions()
-        print("[INFO] Map loaded & posisi acak berhasil.")
 
     def is_jalan(self, color):
         r, g, b = color
@@ -49,12 +51,7 @@ class GameEngine:
         self.update_angle()
         self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
         self.path_index = 0
-
-    def reset_positions(self):
-        if self.map_surface:
-            self.randomize_positions()
-            self.is_moving = False
-            print("[INFO] Posisi berhasil direset.")
+        self.is_moving = False
 
     def generate_path_bfs(self, start, end):
         visited = set()
@@ -73,7 +70,6 @@ class GameEngine:
                     if self.is_jalan(self.map_surface.get_at((nx, ny))[:3]):
                         visited.add((nx, ny))
                         queue.append(((nx, ny), path + [(nx, ny)]))
-        print("[WARN] Path tidak ditemukan.")
         return []
 
     def update_angle(self):
@@ -98,11 +94,9 @@ class GameEngine:
             self.update_angle()
         else:
             self.is_moving = False
-            print("[INFO] Kurir selesai mengantar.")
 
     def stop(self):
         self.is_moving = False
-        print("[INFO] Pergerakan dihentikan.")
 
     def keluar(self):
         self.running = False
