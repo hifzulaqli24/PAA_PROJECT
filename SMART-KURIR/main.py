@@ -5,12 +5,14 @@ from menu import start_menu
 pygame.init()
 WIDTH, HEIGHT = 1200, 800
 win = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Smart Courier v6")
+pygame.display.set_caption("Smart Courier v7")
 
 engine = GameEngine(win, WIDTH, HEIGHT)
 start_menu(engine)
 
+font = pygame.font.SysFont("arial", 20)
 clock = pygame.time.Clock()
+
 while engine.running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -30,6 +32,11 @@ while engine.running:
             win.blit(rotated, rect.topleft)
         if engine.is_moving:
             engine.move_smooth()
+
+        # Status tampilan
+        status = "Mengantar..." if engine.is_moving else "Siap"
+        text_surface = font.render(f"Status: {status}", True, (0, 0, 0))
+        win.blit(text_surface, (10, 10))
 
     pygame.display.update()
     clock.tick(60)
