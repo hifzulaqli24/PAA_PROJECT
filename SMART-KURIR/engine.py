@@ -30,7 +30,7 @@ class GameEngine:
         self.map_surface = pygame.image.load(filepath)
         self.map_surface = pygame.transform.scale(self.map_surface, (self.width, self.height))
         self.randomize_positions()
-        print("[INFO] Map berhasil dimuat dan posisi awal diacak.")
+        print("[INFO] Map berhasil dimuat dan posisi diacak.")
 
     def is_jalan(self, color):
         r, g, b = color
@@ -51,7 +51,7 @@ class GameEngine:
         self.update_angle()
         self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
         self.path_index = 0
-        print(f"[PATH] Panjang path: {len(self.path)}")
+        print(f"[PATH] Ditemukan {len(self.path)} titik dalam jalur.")
 
     def reset_positions(self):
         if self.map_surface:
@@ -78,7 +78,7 @@ class GameEngine:
                         if self.is_jalan(color):
                             visited.add((nx, ny))
                             queue.append(((nx, ny), path + [(nx, ny)]))
-        print("[WARNING] Tidak ditemukan jalur.")
+        print("[WARNING] Jalur tidak ditemukan.")
         return []
 
     def update_angle(self):
@@ -103,11 +103,10 @@ class GameEngine:
             self.update_angle()
         else:
             self.is_moving = False
-            print("[INFO] Kurir sudah sampai tujuan.")
 
     def stop(self):
         self.is_moving = False
-        print("[INFO] Pergerakan dihentikan.")
+        print("[INFO] Pergerakan kurir dihentikan.")
 
     def keluar(self):
         self.running = False
