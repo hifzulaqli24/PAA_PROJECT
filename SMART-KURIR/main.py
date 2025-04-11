@@ -1,37 +1,28 @@
-import tkinter as tk
-from tkinter import filedialog
-import threading
+import pygame
+from engine import GameEngine
 
-def start_menu(engine):
-    def load_map_callback():
-        file = filedialog.askopenfilename(initialdir="maps", title="Pilih Map", filetypes=[("Image Files", "*.jpeg *.jpg *.png")])
-        if file:
-            engine.load_map(file)
+pygame.init()
 
-    def acak_callback():
-        engine.acak_posisi()
+WIDTH, HEIGHT = 1200, 800
+win = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Smart Courier")
 
-    def mulai_callback():
-        if engine.path and len(engine.path) > 1:
-            engine.is_moving = True
+engine = GameEngine(win, WIDTH, HEIGHT)
 
-    def stop_callback():
-        engine.stop()
+clock = pygame.time.Clock()
 
-    def keluar_callback():
-        engine.keluar()
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-    def run_menu():
-        menu = tk.Tk()
-        menu.title("Smart Courier Menu v16")
-        for label, func in [
-            ("Load Map", load_map_callback),
-            ("Acak", acak_callback),
-            ("Mulai", mulai_callback),
-            ("Stop", stop_callback),
-            ("Keluar", keluar_callback),
-        ]:
-            tk.Button(menu, text=label, width=18, command=func).pack(pady=5)
-        menu.mainloop()
+    win.fill((255, 255, 255))
 
-    threading.Thread(target=run_menu, daemon=True).start()
+    if engine.map_surface:
+        win.blit(engine.map_surface, (0, 0))
+
+    pygame.display.update()
+    clock.tick(60)
+
+pygame.quit()
