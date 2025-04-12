@@ -50,11 +50,9 @@ class GameEngine:
         self.courier_pos = self.yellow_flag_pos
         self.red_flag_pos = cari_posisi()
 
-        self.update_angle()
         self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
         self.path_index = 0
-
-        print(f"[INFO] Jalur ditemukan. Panjang path: {len(self.path)} titik.")
+        self.update_angle()
 
     def is_jalan(self, color):
         r, g, b = color
@@ -70,7 +68,7 @@ class GameEngine:
 
         while queue:
             (x, y), path = queue.popleft()
-            if math.dist((x, y), end) < 3:
+            if abs(x - end[0]) < 3 and abs(y - end[1]) < 3:
                 return path + [end]
 
             for dx, dy in directions:
@@ -81,15 +79,16 @@ class GameEngine:
                         if self.is_jalan(color):
                             visited.add((nx, ny))
                             queue.append(((nx, ny), path + [(nx, ny)]))
-
-        print("[WARNING] Path tidak ditemukan. Klik Acak untuk mencoba lagi.")
         return []
 
     def update_angle(self):
-        dx = self.red_flag_pos[0] - self.courier_pos[0]
-        dy = self.red_flag_pos[1] - self.courier_pos[1]
-        angle_rad = math.atan2(-dy, dx)
-        self.courier_angle = math.degrees(angle_rad)
+        if self.path_index + 1 < len(self.path):
+            current = self.path[self.path_index]
+            next_point = self.path[self.path_index + 1]
+            dx = next_point[0] - current[0]
+            dy = next_point[1] - current[1]
+            angle_rad = math.atan2(-dy, dx)
+            self.courier_angle = math.degrees(angle_rad)
 
     def update_courier_position(self):
         if self.path_index < len(self.path):
