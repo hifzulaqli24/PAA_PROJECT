@@ -14,32 +14,42 @@ def start_menu(engine):
         root.destroy()
         if filepath:
             engine.load_map(filepath)
+            print("[INFO] Map berhasil dimuat.")
 
     def acak_callback():
         engine.acak_posisi()
+        print("[INFO] Posisi acak untuk kurir dan tujuan sudah diatur.")
 
     def mulai_callback():
         if engine.path and len(engine.path) > 1:
             engine.is_moving = True
-            print("Kurir mulai bergerak...")
+            print("[INFO] Kurir mulai bergerak.")
         else:
-            print("Path tidak tersedia. Klik Acak dulu.")
+            print("[WARNING] Path belum tersedia. Klik Acak terlebih dahulu.")
 
     def stop_callback():
         engine.stop()
+        print("[INFO] Pergerakan kurir dihentikan.")
 
     def keluar_callback():
         engine.keluar()
 
     def run_menu():
         menu = tk.Tk()
-        menu.title("Smart Courier Menu")
+        menu.title("Menu Smart Courier")
 
-        tk.Button(menu, text="Load Map", width=20, command=load_map_callback).pack(pady=4)
-        tk.Button(menu, text="Acak", width=20, command=acak_callback).pack(pady=4)
-        tk.Button(menu, text="Mulai", width=20, command=mulai_callback).pack(pady=4)
-        tk.Button(menu, text="Stop", width=20, command=stop_callback).pack(pady=4)
-        tk.Button(menu, text="Keluar", width=20, command=keluar_callback).pack(pady=4)
+        tk.Label(menu, text="Smart Courier Control Panel", font=("Arial", 14, "bold")).pack(pady=10)
+
+        buttons = [
+            ("Load Map", load_map_callback),
+            ("Acak", acak_callback),
+            ("Mulai", mulai_callback),
+            ("Stop", stop_callback),
+            ("Keluar", keluar_callback),
+        ]
+
+        for label, func in buttons:
+            tk.Button(menu, text=label, command=func, width=20).pack(pady=5)
 
         menu.mainloop()
 
