@@ -31,45 +31,30 @@ class GameEngine:
         self.path = []
         self.path_index = 0
         self.is_moving = False
-        self.speed = 2
 
     def load_map(self, filepath):
-        try:
-            raw_image = pygame.image.load(filepath)
-            self.map_surface = pygame.transform.scale(raw_image, (self.width, self.height))
-            print(f"Map loaded from: {filepath}")
-            self.acak_posisi()
-        except Exception as e:
-            print(f"Gagal memuat peta: {e}")
-            self.map_surface = None
+        self.map_surface = pygame.image.load(filepath)
+        self.map_surface = pygame.transform.scale(self.map_surface, (self.width, self.height))
+        self.acak_posisi()
 
     def acak_posisi(self):
         def cari_posisi():
-            for _ in range(1000):
+            while True:
                 x = random.randint(50, self.width - 50)
                 y = random.randint(50, self.height - 50)
                 color = self.map_surface.get_at((x, y))[:3]
                 if self.is_jalan(color):
                     return (x, y)
-            return None
 
-        start_pos = cari_posisi()
-        end_pos = cari_posisi()
+        self.yellow_flag_pos = cari_posisi()
+        self.courier_pos = self.yellow_flag_pos
+        self.red_flag_pos = cari_posisi()
 
-        if start_pos and end_pos:
-            self.yellow_flag_pos = start_pos
-            self.courier_pos = list(start_pos)
-            self.red_flag_pos = end_pos
-            self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
-            self.path_index = 0
-            self.update_angle()
-            print("Posisi acak berhasil diatur.")
-        else:
-            self.path = []
-            self.yellow_flag_pos = None
-            self.red_flag_pos = None
-            self.courier_pos = None
-            print("Gagal menemukan posisi yang valid.")
+        self.update_angle()
+        self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
+        self.path_index = 0
+
+        print(f"[INFO] Jalur ditemukan. Panjang path: {len(self.path)} titik.")
 
     def is_jalan(self, color):
         r, g, b = color
@@ -85,7 +70,7 @@ class GameEngine:
 
         while queue:
             (x, y), path = queue.popleft()
-            if abs(x - end[0]) < 3 and abs(y - end[1]) < 3:
+            if math.dist((x, y), end) < 3:
                 return path + [end]
 
             for dx, dy in directions:
@@ -96,40 +81,21 @@ class GameEngine:
                         if self.is_jalan(color):
                             visited.add((nx, ny))
                             queue.append(((nx, ny), path + [(nx, ny)]))
+
+        print("[WARNING] Path tidak ditemukan. Klik Acak untuk mencoba lagi.")
         return []
 
     def update_angle(self):
-        if self.red_flag_pos and self.courier_pos:
-            dx = self.red_flag_pos[0] - self.courier_pos[0]
-            dy = self.red_flag_pos[1] - self.courier_pos[1]
-            angle_rad = math.atan2(-dy, dx)
-            self.courier_angle = math.degrees(angle_rad)
-
-    def update_angle_to_target(self, target_x, target_y):
-        dx = target_x - self.courier_pos[0]
-        dy = target_y - self.courier_pos[1]
-        if dx != 0 or dy != 0:
-            angle_rad = math.atan2(-dy, dx)
-            self.courier_angle = math.degrees(angle_rad)
+        dx = self.red_flag_pos[0] - self.courier_pos[0]
+        dy = self.red_flag_pos[1] - self.courier_pos[1]
+        angle_rad = math.atan2(-dy, dx)
+        self.courier_angle = math.degrees(angle_rad)
 
     def update_courier_position(self):
         if self.path_index < len(self.path):
-            target = self.path[self.path_index]
-            tx, ty = target
-            cx, cy = self.courier_pos
-            dx, dy = tx - cx, ty - cy
-            dist = math.hypot(dx, dy)
-
-            if dist < self.speed:
-                self.courier_pos = list(target)
-                self.path_index += 1
-            else:
-                move_x = self.speed * dx / dist
-                move_y = self.speed * dy / dist
-                self.courier_pos[0] += move_x
-                self.courier_pos[1] += move_y
-
-            self.update_angle_to_target(tx, ty)
+            self.courier_pos = self.path[self.path_index]
+            self.update_angle()
+            self.path_index += 1
         else:
             self.is_moving = False
 
