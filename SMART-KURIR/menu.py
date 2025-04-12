@@ -3,24 +3,44 @@ from tkinter import filedialog
 import threading
 
 def start_menu(engine):
-    def load(): 
-        f = filedialog.askopenfilename(initialdir="maps", title="Pilih Map", filetypes=[("Image Files", "*.jpeg *.jpg *.png")])
-        if f: engine.load_map_and_random(f)
-
-    def acak(): engine.randomize_positions()
-    def mulai(): 
-        if engine.path: 
-            engine.is_moving = True
-
-    def stop(): engine.stop()
-    def keluar(): engine.keluar()
-
-    def run():
+    def load_map_callback():
         root = tk.Tk()
-        root.title("Smart Courier Menu v15")
-        root.geometry("200x220")
-        for text, cmd in [("Load Map", load), ("Acak", acak), ("Mulai", mulai), ("Stop", stop), ("Keluar", keluar)]:
-            tk.Button(root, text=text, command=cmd, width=18).pack(pady=5)
-        root.mainloop()
+        root.withdraw()
+        filepath = filedialog.askopenfilename(
+            initialdir="maps",
+            title="Pilih Map",
+            filetypes=[("Image Files", "*.jpeg *.jpg *.png")]
+        )
+        root.destroy()
+        if filepath:
+            engine.load_map(filepath)
 
-    threading.Thread(target=run, daemon=True).start()
+    def acak_callback():
+        engine.acak_posisi()
+
+    def mulai_callback():
+        if engine.path and len(engine.path) > 1:
+            engine.is_moving = True
+            print("Kurir mulai bergerak...")
+        else:
+            print("Path tidak tersedia. Klik Acak dulu.")
+
+    def stop_callback():
+        engine.stop()
+
+    def keluar_callback():
+        engine.keluar()
+
+    def run_menu():
+        menu = tk.Tk()
+        menu.title("Smart Courier Menu")
+
+        tk.Button(menu, text="Load Map", width=20, command=load_map_callback).pack(pady=4)
+        tk.Button(menu, text="Acak", width=20, command=acak_callback).pack(pady=4)
+        tk.Button(menu, text="Mulai", width=20, command=mulai_callback).pack(pady=4)
+        tk.Button(menu, text="Stop", width=20, command=stop_callback).pack(pady=4)
+        tk.Button(menu, text="Keluar", width=20, command=keluar_callback).pack(pady=4)
+
+        menu.mainloop()
+
+    threading.Thread(target=run_menu, daemon=True).start()
