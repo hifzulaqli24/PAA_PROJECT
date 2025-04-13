@@ -12,6 +12,7 @@ class GameEngine:
         self.running = True
 
         self.map_surface = None
+        self.map_pixels = None
 
         self.red_flag_img = pygame.transform.scale(
             pygame.image.load("assets/red_flag.png"), (50, 50)
@@ -50,17 +51,16 @@ class GameEngine:
         self.courier_pos = self.yellow_flag_pos
         self.red_flag_pos = cari_posisi()
 
+        self.update_angle()
         self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
         self.path_index = 0
-        if self.path:
-            self.update_angle()
-            print(f"Path ditemukan dengan panjang: {len(self.path)}")
-        else:
-            print("Tidak ditemukan jalur dari kurir ke tujuan. Silakan klik 'Acak' lagi.")
+
+        print(f"Path ditemukan dengan panjang: {len(self.path)}")
 
     def is_jalan(self, color):
         r, g, b = color
-        return abs(r - 95) <= 10 and abs(g - 95) <= 10 and abs(b - 95) <= 10
+        # Toleransi warna diperluas dari ±10 ke ±20
+        return abs(r - 95) <= 20 and abs(g - 95) <= 20 and abs(b - 95) <= 20
 
     def generate_path_bfs(self, start, end):
         visited = set()
@@ -83,16 +83,15 @@ class GameEngine:
                         if self.is_jalan(color):
                             visited.add((nx, ny))
                             queue.append(((nx, ny), path + [(nx, ny)]))
+
+        print("Path tidak tersedia. Klik Acak dulu.")
         return []
 
     def update_angle(self):
-        if self.path_index + 1 < len(self.path):
-            current = self.path[self.path_index]
-            next_point = self.path[self.path_index + 1]
-            dx = next_point[0] - current[0]
-            dy = next_point[1] - current[1]
-            angle_rad = math.atan2(-dy, dx)
-            self.courier_angle = math.degrees(angle_rad)
+        dx = self.red_flag_pos[0] - self.courier_pos[0]
+        dy = self.red_flag_pos[1] - self.courier_pos[1]
+        angle_rad = math.atan2(-dy, dx)
+        self.courier_angle = math.degrees(angle_rad)
 
     def update_courier_position(self):
         if self.path_index < len(self.path):
