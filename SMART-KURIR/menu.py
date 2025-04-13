@@ -4,20 +4,17 @@ import threading
 
 def start_menu(engine):
     def load_map_callback():
-        def pilih_file():
-            root = tk.Tk()
-            root.withdraw()
-            filepath = filedialog.askopenfilename(
-                initialdir="maps",
-                title="Pilih Map",
-                filetypes=[("Image Files", "*.jpeg *.jpg *.png")]
-            )
-            root.destroy()
-            if filepath:
-                engine.load_map(filepath)
-        
-        # Jalankan pemilihan file di thread terpisah agar tidak freeze
-        threading.Thread(target=pilih_file).start()
+        # Membuat root sementara untuk file dialog, lalu menghancurkannya
+        root = tk.Tk()
+        root.withdraw()
+        filepath = filedialog.askopenfilename(
+            initialdir="maps",
+            title="Pilih Map",
+            filetypes=[("Image Files", "*.jpeg *.jpg *.png")]
+        )
+        root.destroy()
+        if filepath:
+            engine.load_map(filepath)
 
     def acak_callback():
         engine.acak_posisi()
