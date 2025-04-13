@@ -52,7 +52,11 @@ class GameEngine:
 
         self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
         self.path_index = 0
-        self.update_angle()
+        if self.path:
+            self.update_angle()
+            print(f"Path ditemukan dengan panjang: {len(self.path)}")
+        else:
+            print("Tidak ditemukan jalur dari kurir ke tujuan. Silakan klik 'Acak' lagi.")
 
     def is_jalan(self, color):
         r, g, b = color
