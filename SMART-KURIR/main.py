@@ -18,21 +18,23 @@ while engine.running:
 
     win.fill((255, 255, 255))
 
+    # Render peta terlebih dahulu
     if engine.map_surface:
         win.blit(engine.map_surface, (0, 0))
 
-        if engine.yellow_flag_pos:
-            win.blit(engine.yellow_flag_img, engine.yellow_flag_pos)
-        if engine.red_flag_pos:
-            win.blit(engine.red_flag_img, engine.red_flag_pos)
+    # Update posisi kurir jika sedang bergerak
+    if engine.is_moving:
+        engine.update_courier_position()
 
-        if engine.courier_pos:
-            rotated_img = pygame.transform.rotate(engine.courier_img, engine.courier_angle)
-            rect = rotated_img.get_rect(center=engine.courier_pos)
-            win.blit(rotated_img, rect.topleft)
-
-        if engine.is_moving:
-            engine.update_courier_position()
+    # Gambar bendera dan kurir setelah peta
+    if engine.yellow_flag_pos:
+        win.blit(engine.yellow_flag_img, engine.yellow_flag_pos)
+    if engine.red_flag_pos:
+        win.blit(engine.red_flag_img, engine.red_flag_pos)
+    if engine.courier_pos:
+        rotated_img = pygame.transform.rotate(engine.courier_img, engine.courier_angle)
+        rect = rotated_img.get_rect(center=engine.courier_pos)
+        win.blit(rotated_img, rect.topleft)
 
     pygame.display.update()
     clock.tick(60)
