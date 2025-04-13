@@ -12,17 +12,10 @@ class GameEngine:
         self.running = True
 
         self.map_surface = None
-        self.map_pixels = None
 
-        self.red_flag_img = pygame.transform.scale(
-            pygame.image.load("assets/red_flag.png"), (50, 50)
-        )
-        self.yellow_flag_img = pygame.transform.scale(
-            pygame.image.load("assets/yellow.png"), (50, 44)
-        )
-        self.courier_img = pygame.transform.scale(
-            pygame.image.load("assets/kurir.png"), (40, 40)
-        )
+        self.red_flag_img = pygame.transform.scale(pygame.image.load("assets/red_flag.png"), (50, 50))
+        self.yellow_flag_img = pygame.transform.scale(pygame.image.load("assets/yellow.png"), (50, 44))
+        self.courier_img = pygame.transform.scale(pygame.image.load("assets/kurir.png"), (40, 40))
 
         self.red_flag_pos = None
         self.yellow_flag_pos = None
@@ -55,12 +48,15 @@ class GameEngine:
         self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
         self.path_index = 0
 
-        print(f"Path ditemukan dengan panjang: {len(self.path)}")
+        if not self.path:
+            print("Tidak dapat menemukan jalur dari posisi awal ke tujuan.")
+            self.is_moving = False
+        else:
+            print(f"Path ditemukan dengan panjang: {len(self.path)}")
 
     def is_jalan(self, color):
         r, g, b = color
-        # Toleransi warna diperluas dari ±10 ke ±20
-        return abs(r - 95) <= 20 and abs(g - 95) <= 20 and abs(b - 95) <= 20
+        return abs(r - 95) <= 10 and abs(g - 95) <= 10 and abs(b - 95) <= 10
 
     def generate_path_bfs(self, start, end):
         visited = set()
@@ -84,7 +80,6 @@ class GameEngine:
                             visited.add((nx, ny))
                             queue.append(((nx, ny), path + [(nx, ny)]))
 
-        print("Path tidak tersedia. Klik Acak dulu.")
         return []
 
     def update_angle(self):
