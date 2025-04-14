@@ -4,7 +4,6 @@ import threading
 
 def start_menu(engine):
     def load_map_callback():
-        # Membuat root sementara untuk file dialog, lalu menghancurkannya
         root = tk.Tk()
         root.withdraw()
         filepath = filedialog.askopenfilename(
@@ -25,6 +24,7 @@ def start_menu(engine):
             print("Kurir mulai bergerak...")
         else:
             print("Path tidak tersedia. Klik Acak dulu.")
+
 
     def stop_callback():
         engine.stop()
