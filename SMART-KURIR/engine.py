@@ -12,10 +12,18 @@ class GameEngine:
         self.running = True
 
         self.map_surface = None
+        self.map_pixels = None
 
-        self.red_flag_img = pygame.transform.scale(pygame.image.load("assets/red_flag.png"), (50, 50))
-        self.yellow_flag_img = pygame.transform.scale(pygame.image.load("assets/yellow.png"), (50, 44))
-        self.courier_img = pygame.transform.scale(pygame.image.load("assets/kurir.png"), (40, 40))
+        # Load dan sesuaikan ukuran asset
+        self.red_flag_img = pygame.transform.scale(
+            pygame.image.load("assets/red_flag.png"), (50, 50)
+        )
+        self.yellow_flag_img = pygame.transform.scale(
+            pygame.image.load("assets/yellow.png"), (50, 44)
+        )
+        self.courier_img = pygame.transform.scale(
+            pygame.image.load("assets/kurir.png"), (40, 40)
+        )
 
         self.red_flag_pos = None
         self.yellow_flag_pos = None
@@ -48,11 +56,7 @@ class GameEngine:
         self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
         self.path_index = 0
 
-        if not self.path:
-            print("Tidak dapat menemukan jalur dari posisi awal ke tujuan.")
-            self.is_moving = False
-        else:
-            print(f"Path ditemukan dengan panjang: {len(self.path)}")
+        print(f"Path ditemukan dengan panjang: {len(self.path)}")
 
     def is_jalan(self, color):
         r, g, b = color
@@ -64,7 +68,7 @@ class GameEngine:
         visited.add(start)
 
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1),
-                      (-1, -1), (-1, 1), (1, -1), (1, 1)]
+                      (-1, -1), (-1, 1), (1, -1), (1, 1)]  # Tambahkan diagonal
 
         while queue:
             (x, y), path = queue.popleft()
@@ -80,6 +84,7 @@ class GameEngine:
                             visited.add((nx, ny))
                             queue.append(((nx, ny), path + [(nx, ny)]))
 
+        print("Path tidak tersedia. Klik Acak dulu.")
         return []
 
     def update_angle(self):
