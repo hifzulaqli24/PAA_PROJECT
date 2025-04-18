@@ -18,12 +18,11 @@ def start_menu(engine):
     def acak_callback():
         engine.acak_posisi()
 
-    def mulai_callback():
-        if engine.path and len(engine.path) > 1:
-            engine.is_moving = True
-            print("Kurir mulai bergerak...")
-        else:
-            print("Path tidak tersedia. Klik Acak dulu.")
+    def ambil_paket_callback():
+        engine.start_to_source()
+
+    def antar_paket_callback():
+        engine.start_to_destination()
 
 
     def stop_callback():
@@ -38,7 +37,8 @@ def start_menu(engine):
 
         tk.Button(menu, text="Load Map", command=load_map_callback).pack(pady=5)
         tk.Button(menu, text="Acak", command=acak_callback).pack(pady=5)
-        tk.Button(menu, text="Mulai", command=mulai_callback).pack(pady=5)
+        tk.Button(menu, text="Ambil Paket", command=ambil_paket_callback).pack(pady=5)
+        tk.Button(menu, text="Antar Paket", command=antar_paket_callback).pack(pady=5)
         tk.Button(menu, text="Stop", command=stop_callback).pack(pady=5)
         tk.Button(menu, text="Keluar", command=keluar_callback).pack(pady=5)
 
