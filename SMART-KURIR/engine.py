@@ -4,6 +4,7 @@ import math
 import sys
 from collections import deque
 
+
 class GameEngine:
     def __init__(self, window, width, height):
         self.win = window
