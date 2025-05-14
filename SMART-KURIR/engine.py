@@ -14,7 +14,6 @@ class GameEngine:
         self.current_task = None
         self.has_arrived_at_source = False
 
-
         self.map_surface = None
         self.map_pixels = None
 
@@ -69,11 +68,9 @@ class GameEngine:
         self.path_index = 0
         self.is_moving = False
 
-        # 🔥 Reset status tugas
+        # 🔄 Reset status tugas
         self.has_arrived_at_source = False
         self.current_task = None
-
-
 
     def is_jalan(self, color):
         r, g, b = color
@@ -104,13 +101,12 @@ class GameEngine:
         print("Path tidak tersedia.")
         return []
 
-
     def start_to_source(self):
         self.path = self.generate_path_bfs(self.courier_pos, self.yellow_flag_pos)
         self.path_index = 0
         self.is_moving = True
         self.current_task = "to_source"
-        self.has_arrived_at_source = False  # Reset status
+        self.has_arrived_at_source = False
 
     def start_to_destination(self):
         if not self.has_arrived_at_source:
@@ -141,7 +137,6 @@ class GameEngine:
                 print("Kurir telah mengantar paket ke bendera merah (destination).")
             self.is_moving = False
             self.current_task = None
-
 
     def stop(self):
         self.is_moving = False
