@@ -24,7 +24,6 @@ def start_menu(engine):
     def antar_paket_callback():
         engine.start_to_destination()
 
-
     def stop_callback():
         engine.stop()
 
