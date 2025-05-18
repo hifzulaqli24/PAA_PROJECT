@@ -2,8 +2,8 @@ import pygame
 import random
 import math
 import sys
+import os
 from collections import deque
-
 
 class GameEngine:
     def __init__(self, window, width, height):
@@ -13,18 +13,23 @@ class GameEngine:
         self.running = True
         self.current_task = None
         self.has_arrived_at_source = False
+        self.has_picked_package = False
+        self.alert_message = None
+        self.alert_timer = 0
+
+
 
         self.map_surface = None
         self.map_pixels = None
 
         self.red_flag_img = pygame.transform.scale(
-            pygame.image.load("assets/red_flag.png"), (50, 50)
+            pygame.image.load("assets/red_flag.png"), (40, 40)
         )
         self.yellow_flag_img = pygame.transform.scale(
-            pygame.image.load("assets/yellow.png"), (50, 44)
+            pygame.image.load("assets/yellow.png"), (40, 40)
         )
         self.courier_img = pygame.transform.scale(
-            pygame.image.load("assets/kurir.png"), (40, 40)
+            pygame.image.load("assets/kurir.png"), (35, 70)
         )
 
         self.red_flag_pos = None
@@ -36,11 +41,62 @@ class GameEngine:
         self.path_index = 0
         self.is_moving = False
         self.current_task = None  # "to_source" or "to_destination"
+        self.position_index = 0
+
+
+        self.current_map_name = None  # Untuk menyimpan nama file map yang digunakan
+
+        self.fixed_positions = {
+            "map1.jpeg": {
+                "kurir": [(786, 683), (1263, 669), (627, 246), (90, 665)],
+                "kuning": [(401, 192), (97, 448), (897, 649), (581, 553)],
+                "merah": [(1181, 355), (1189, 153), (1286, 440), (1083, 225)],
+            },
+            "map2.jpeg": {
+                "kurir": [(13, 418), (603, 662), (269, 19), (915, 7)],
+                "kuning": [(777, 246), (291, 264), (765, 121), (479, 560)],
+                "merah": [(405, 128), (1192, 132), (1228, 481), (1091, 230)],
+            }   
+        }
+
+
+
+    def show_alert(self, message, duration=120):  # 120 frame = 2 detik kalau 60 fps
+        self.alert_message = message
+        self.alert_timer = duration
+
+    def draw_alert(self):
+        if self.alert_message:
+            # Kotak alert di tengah layar
+            alert_width, alert_height = 400, 200
+            alert_x = (self.width - alert_width) // 2
+            alert_y = (self.height - alert_height) // 2
+            pygame.draw.rect(self.win, (240, 240, 240), (alert_x, alert_y, alert_width, alert_height), border_radius=10)
+            pygame.draw.rect(self.win, (100, 100, 100), (alert_x, alert_y, alert_width, alert_height), 2, border_radius=10)
+
+            # Teks pesan
+            font = pygame.font.SysFont(None, 28)
+            text_surface = font.render(self.alert_message, True, (0, 0, 0))
+            text_rect = text_surface.get_rect(center=(self.width // 2, self.height // 2 - 30))
+            self.win.blit(text_surface, text_rect)
+
+            # Tombol OK
+            self.ok_button_rect = pygame.Rect(alert_x + 150, alert_y + 120, 100, 40)
+            pygame.draw.rect(self.win, (180, 180, 180), self.ok_button_rect, border_radius=5)
+            pygame.draw.rect(self.win, (100, 100, 100), self.ok_button_rect, 2, border_radius=5)
+
+            ok_text = font.render("OK", True, (0, 0, 0))
+            ok_rect = ok_text.get_rect(center=self.ok_button_rect.center)
+            self.win.blit(ok_text, ok_rect)
+
+    def handle_alert_click(self, pos):
+        if self.alert_message and hasattr(self, 'ok_button_rect') and self.ok_button_rect.collidepoint(pos):
+            self.alert_message = None
 
     def load_map(self, filepath):
         self.map_surface = pygame.image.load(filepath)
         self.map_surface = pygame.transform.scale(self.map_surface, (self.width, self.height))
-        self.courier_pos = self.get_random_jalan_pos()
+        self.current_map_name = os.path.basename(filepath)  # ⬅️ Tambahkan ini
 
     def get_random_jalan_pos(self):
         while True:
@@ -51,30 +107,37 @@ class GameEngine:
                 return (x, y)
 
     def acak_posisi(self):
-        def cari_posisi():
-            while True:
-                x = random.randint(50, self.width - 50)
-                y = random.randint(50, self.height - 50)
-                color = self.map_surface.get_at((x, y))[:3]
-                if self.is_jalan(color):
-                    return (x, y)
+        map_name = self.current_map_name
+        if map_name in self.fixed_positions:
+            positions = self.fixed_positions[map_name]
+            index = self.position_index % len(positions["kurir"])  # pastikan rotasi
+            
+            self.courier_pos = positions["kurir"][index]
+            self.yellow_flag_pos = positions["kuning"][index]
+            self.red_flag_pos = positions["merah"][index]
 
-        self.yellow_flag_pos = cari_posisi()
-        self.red_flag_pos = cari_posisi()
-        self.courier_pos = cari_posisi()
+            self.update_angle()
+            self.path = []
+            self.path_index = 0
+            self.is_moving = False
 
-        self.update_angle()
-        self.path = []
-        self.path_index = 0
-        self.is_moving = False
+            # 🔥 Reset status tugas
+            self.has_arrived_at_source = False
+            self.current_task = None
+            self.has_picked_package = False
 
-        # 🔄 Reset status tugas
-        self.has_arrived_at_source = False
-        self.current_task = None
+            # Naikkan index untuk pemanggilan berikutnya
+            self.position_index += 1
+        else:
+            print("Map tidak dikenali untuk posisi tetap.")
+
+
+
+
 
     def is_jalan(self, color):
         r, g, b = color
-        return abs(r - 95) <= 10 and abs(g - 95) <= 10 and abs(b - 95) <= 10
+        return all(90 <= c <= 150 for c in (r, g, b))    
 
     def generate_path_bfs(self, start, end):
         visited = set()
@@ -86,8 +149,9 @@ class GameEngine:
 
         while queue:
             (x, y), path = queue.popleft()
-            if abs(x - end[0]) < 3 and abs(y - end[1]) < 3:
-                return path + [end]
+            if (x, y) == end:
+             return path
+
 
             for dx, dy in directions:
                 nx, ny = x + dx, y + dy
@@ -101,42 +165,74 @@ class GameEngine:
         print("Path tidak tersedia.")
         return []
 
+
     def start_to_source(self):
         self.path = self.generate_path_bfs(self.courier_pos, self.yellow_flag_pos)
+
+         # DEBUG: cek warna jalan
+        print("Warna pada posisi kurir:", self.map_surface.get_at(self.courier_pos)[:3])
+        print("Warna pada tujuan (kuning):", self.map_surface.get_at(self.yellow_flag_pos)[:3])
+
+        if not self.path:
+            self.show_alert("Tidak ada jalur ke bendera kuning!")
+            return
         self.path_index = 0
         self.is_moving = True
         self.current_task = "to_source"
         self.has_arrived_at_source = False
 
+
+
     def start_to_destination(self):
-        if not self.has_arrived_at_source:
-            print("Ambil paket terlebih dahulu!")
+        if not self.has_picked_package:
+            self.show_alert("Ambil paket terlebih dahulu!")
             return
+        
+        print("Warna pada posisi kurir:", self.map_surface.get_at(self.courier_pos)[:3])
+        print("Warna pada tujuan (merah):", self.map_surface.get_at(self.red_flag_pos)[:3])
+
         self.path = self.generate_path_bfs(self.courier_pos, self.red_flag_pos)
+        if not self.path:
+            self.show_alert("Tidak ada jalur ke bendera merah!")
+            return
         self.path_index = 0
         self.is_moving = True
         self.current_task = "to_destination"
 
     def update_angle(self):
-        if self.path_index < len(self.path):
-            dx = self.path[self.path_index][0] - self.courier_pos[0]
-            dy = self.path[self.path_index][1] - self.courier_pos[1]
-            angle_rad = math.atan2(-dy, dx)
-            self.courier_angle = math.degrees(angle_rad)
+        if self.path_index < len(self.path) - 1:
+            # Ambil dua titik, titik sekarang dan titik berikutnya
+            x1, y1 = self.path[self.path_index]
+            x2, y2 = self.path[self.path_index + 1]
+            
+            dx = x2 - x1
+            dy = y2 - y1
+            
+            # Menghitung sudut dengan atan2 untuk memastikan rotasi yang tepat
+            angle_rad = math.atan2(dy, dx)
+            
+            # Konversi ke derajat dan sesuaikan dengan rotasi yang benar
+            self.courier_angle = -math.degrees(angle_rad) + 90  # +90 untuk koreksi karena gambar awal menghadap ke atas
+
+
 
     def update_courier_position(self):
         if self.path_index < len(self.path):
             self.courier_pos = self.path[self.path_index]
-            self.update_angle()
+            self.update_angle()  # Update arah kurir
             self.path_index += 1
         else:
             if self.current_task == "to_source":
                 print("Kurir telah sampai di bendera kuning (source).")
                 self.has_arrived_at_source = True
+                self.has_picked_package = True  # Paket telah diambil
             elif self.current_task == "to_destination":
                 print("Kurir telah mengantar paket ke bendera merah (destination).")
             self.is_moving = False
             self.current_task = None
+
+
+
 
     def stop(self):
         self.is_moving = False
