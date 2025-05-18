@@ -28,9 +28,32 @@ class GameEngine:
         self.yellow_flag_img = pygame.transform.scale(
             pygame.image.load("assets/yellow.png"), (40, 40)
         )
-        self.courier_img = pygame.transform.scale(
-            pygame.image.load("assets/kurir.png"), (35, 70)
+        self.motor_img = pygame.transform.scale(
+            pygame.image.load("assets/motor.png"), (35, 70)
         )
+        self.motor_img = pygame.transform.scale(
+            pygame.image.load("assets/motor.png"), (30, 65)
+        )
+        self.truck_img = pygame.transform.scale(
+            pygame.image.load("assets/truk.png"), (40, 80)
+        )
+
+        self.courier_types = {
+            "map1.jpeg": {
+                0: "motor",
+                1: "truck",
+                2: "motor",
+                3: "truck",
+            },
+            "map2.jpeg": {
+                0: "truck",
+                1: "motor",
+                2: "truck",
+                3: "motor",
+            }
+        }
+
+        self.courier_img = self.motor_img  # default sementara
 
         self.red_flag_pos = None
         self.yellow_flag_pos = None
@@ -53,9 +76,9 @@ class GameEngine:
                 "merah": [(1181, 355), (1189, 153), (1286, 440), (1083, 225)],
             },
             "map2.jpeg": {
-                "kurir": [(13, 418), (603, 662), (269, 19), (915, 7)],
-                "kuning": [(777, 246), (291, 264), (765, 121), (479, 560)],
-                "merah": [(405, 128), (1192, 132), (1228, 481), (1091, 230)],
+                "kurir": [(269, 19), (13, 418), (915, 7), (603, 662)],
+                "kuning": [(765, 121), (777, 246), (479, 560), (291, 264)],
+                "merah": [(1228, 481), (405, 128), (1197, 283), (1192, 132)],
             }   
         }
 
@@ -111,10 +134,21 @@ class GameEngine:
         if map_name in self.fixed_positions:
             positions = self.fixed_positions[map_name]
             index = self.position_index % len(positions["kurir"])  # pastikan rotasi
+            # Tentukan jenis kurir berdasarkan index
+
             
             self.courier_pos = positions["kurir"][index]
             self.yellow_flag_pos = positions["kuning"][index]
             self.red_flag_pos = positions["merah"][index]
+
+            # Tentukan gambar kurir berdasarkan tipe dan map
+            map_name = self.current_map_name
+            courier_type = self.courier_types.get(map_name, {}).get(index, "motor")  # default motor
+
+            if courier_type == "motor":
+                self.courier_img = self.motor_img
+            else:
+                self.courier_img = self.truck_img
 
             self.update_angle()
             self.path = []
