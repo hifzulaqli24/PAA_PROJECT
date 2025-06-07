@@ -134,36 +134,34 @@ class GameEngine:
         if map_name in self.fixed_positions:
             positions = self.fixed_positions[map_name]
             index = self.position_index % len(positions["kurir"])  # pastikan rotasi
-            # Tentukan jenis kurir berdasarkan index
 
-            
             self.courier_pos = positions["kurir"][index]
             self.yellow_flag_pos = positions["kuning"][index]
             self.red_flag_pos = positions["merah"][index]
 
-            # Tentukan gambar kurir berdasarkan tipe dan map
-            map_name = self.current_map_name
-            courier_type = self.courier_types.get(map_name, {}).get(index, "motor")  # default motor
+            courier_type = self.courier_types.get(map_name, {}).get(index, "motor")
+            self.courier_img = self.motor_img if courier_type == "motor" else self.truck_img
 
-            if courier_type == "motor":
-                self.courier_img = self.motor_img
-            else:
-                self.courier_img = self.truck_img
-
-            self.update_angle()
-            self.path = []
-            self.path_index = 0
-            self.is_moving = False
-
-            # 🔥 Reset status tugas
-            self.has_arrived_at_source = False
-            self.current_task = None
-            self.has_picked_package = False
-
-            # Naikkan index untuk pemanggilan berikutnya
             self.position_index += 1
         else:
-            print("Map tidak dikenali untuk posisi tetap.")
+            # Map baru, gunakan posisi acak di area jalan
+            self.courier_pos = self.get_random_jalan_pos()
+            self.yellow_flag_pos = self.get_random_jalan_pos()
+            self.red_flag_pos = self.get_random_jalan_pos()
+
+            # Default gunakan motor untuk map baru
+            self.courier_img = self.motor_img
+            print(f"[INFO] Map baru: posisi acak ditentukan.")
+
+        # Reset dan update status
+        self.update_angle()
+        self.path = []
+        self.path_index = 0
+        self.is_moving = False
+        self.has_arrived_at_source = False
+        self.current_task = None
+        self.has_picked_package = False
+
 
 
 
